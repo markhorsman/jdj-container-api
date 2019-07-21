@@ -1,0 +1,20 @@
+{
+  "name": "jdj-container-api",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "author": "Mark Horsman",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.5",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "eslint": "^6.1.0",
+    "express": "^4.17.1",
+    "express-basic-auth": "^1.2.0",
+    "express-rate-limit": "^2.11.0",
+    "lodash": "^4.17.15",
+    "moment": "^2.20.1",
+    "mssql": "^5.1.0",
+    "nconf": "^0.10.0"
+  }
+}

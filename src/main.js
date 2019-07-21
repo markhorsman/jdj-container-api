@@ -55,9 +55,6 @@ const setup = insts =>
 
     insts.app.use(basicAuth({ users: cnf.get('auth') }));
 
-    // insts.app.use(bodyParser.json({ limit: '50mb' }));
-    // insts.app.use(bodyParser.urlencoded({ extended: true }));
-
     insts.app.use((req, res, next) => {
       req.mssql         = insts.mssql;
       req.dbpools       = insts.dbpools;
@@ -65,6 +62,7 @@ const setup = insts =>
     });
 
     insts.app.get("/customercontact/:identification?", handlers.customerContact);
+    insts.app.put("/contitem/:recid/:status", handlers.contItem);
     insts.app.use(handlers.error);
 
     return insts;

@@ -14,7 +14,7 @@ module.exports = function (req, res, next) {
     };
 
     const rtn = result => {
-        if (!result || !result.recordset.length)
+        if (!result || !result.affectedRows)
             throw new errors.http.NotFound(`Updaten van contitem met recid: ${req.params.recid} is mislukt.`);
 
         return res.status(200).send({ success: true, data: req.params });

@@ -7,14 +7,14 @@ module.exports = function (req, res, next) {
         return req.mssql.request()
             .input('status', sql.Int, parseInt(status))
             .input('recid', sql.NVarChar, recid)
-            .query('UPDATE dbo.Stock SET STATUS = @status WHERE RECID = @recid')
+            .query('UPDATE dbo.ContItems SET STATUS = @status WHERE RECID = @recid')
             .then(rtn)
             .catch(next)
             ;
     };
 
     const rtn = result => {
-        if (!result || !result.affectedRows)
+        if (!result || !result.rowsAffected)
             throw new errors.http.NotFound(`Updaten van contitem met recid: ${req.params.recid} is mislukt.`);
 
         return res.status(200).send({ success: true, data: req.params });

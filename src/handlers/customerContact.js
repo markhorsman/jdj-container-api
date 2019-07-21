@@ -5,11 +5,11 @@ const errors = require('../../lib/classes/errors');
 module.exports = function (req, res, next) {
     const fields = ['RECID', 'ACCT', 'CODE', 'NAME', 'ADDRESS1', 'ADDRESS2', 'ADDRESS3', 'ADDRESS4', 'POSTCODE', 'TELEPHONE', 'EMAIL', 'REFERENCE', 'IDENTIFICATION'];
     let limit = 1;
-    
+
     const findOne = id => {
         return req.mssql.request()
             .input('identification', sql.NVarChar, id)
-            .query(`SELECT TOP ${limit} ${fields.join(',')} FROM dbo.CustomerContact WHERE IDENTIFICATION = @identification`)
+            .query(`SELECT TOP ${limit} ${fields.join(',')} FROM dbo.CustomerContact WHERE REFERENCE = @identification`)
             .then(rtn)
             .catch(next)
             ;

@@ -63,7 +63,7 @@ const setup = insts =>
 
     insts.app.get("/customercontact/:identification?", handlers.customerContact);
     insts.app.put("/contitem/:recid/:status", handlers.contItem);
-    insts.app.put("/stock/:recid/:status/:quantity/:type", handlers.stock);
+    insts.app.put("/stock/:recid", handlers.stock);
     insts.app.use(handlers.error);
 
     return insts;

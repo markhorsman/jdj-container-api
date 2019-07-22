@@ -3,12 +3,24 @@ const sql = P.promisifyAll(require("mssql"));
 const errors = require('../../lib/classes/errors');
 
 module.exports = function (req, res, next) {
-    const update = (recid, status, quantity, type) => {
+    const body = req.body;
+    const id = req.params.recid;
+    const updateBulk = (recid, status, quantity, type) => {
         return req.mssql.request()
             .input('status', sql.Int, parseInt(status))
             .input('recid', sql.NVarChar, recid)
             .input('qty', sql.Int, quantity)
             .query(`UPDATE dbo.Stock SET STATUS = @status, STKLEVEL = STKLEVEL ${type === 'add' ? '+' : '-'} @qty, QTYALLOC = 0 WHERE RECID = @recid`)
+            .then(rtn)
+            .catch(next)
+            ;
+    };
+
+    const updateUnique = (recid, status, type) => {
+        return req.mssql.request()
+            .input('status', sql.Int, parseInt(status))
+            .input('recid', sql.NVarChar, recid)
+            .query(`UPDATE dbo.Stock SET STATUS = @status, QTYHIRE = ${type === 'add' ? 1 : 0}, QTYREP = ${(type === 'substract' && status === 2 ? 1 : 0)} WHERE RECID = @recid`)
             .then(rtn)
             .catch(next)
             ;
@@ -21,5 +33,6 @@ module.exports = function (req, res, next) {
         return res.status(200).send({ success: true, data: req.params });
     };
 
-    return update(req.params.recid, req.params.status, req.params.quantity, req.params.type);
+    if (body.unique) return updateUnique(id, body.status, body.type);
+    return updateBulk(id, body.status, body.quantity, body.type);
 }

@@ -8,7 +8,7 @@ module.exports = function (req, res, next) {
             .input('status', sql.Int, parseInt(status))
             .input('recid', sql.NVarChar, recid)
             .input('qty', sql.Int, quantity)
-            .query(`UPDATE dbo.Stock SET STATUS = @status, STKLEVEL = STKLEVEL ${type === 'add' ? '+' : '-'} @qty WHERE RECID = @recid`)
+            .query(`UPDATE dbo.Stock SET STATUS = @status, STKLEVEL = STKLEVEL ${type === 'add' ? '+' : '-'} @qty, QTYALLOC = 0 WHERE RECID = @recid`)
             .then(rtn)
             .catch(next)
             ;

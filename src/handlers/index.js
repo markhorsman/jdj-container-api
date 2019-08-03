@@ -6,4 +6,5 @@ module.exports  = {
     },
     contItem: require('./contItem'),
     stock: require('./stock'),
+    stockTransfer: require('./stockTransfer')
 };

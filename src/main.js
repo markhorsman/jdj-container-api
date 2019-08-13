@@ -66,6 +66,7 @@ const setup = insts => {
   insts.app.put("/contitem/:recid/:status", handlers.contItem);
   insts.app.put("/stock/:recid", handlers.stock);
   insts.app.put("/stocktransfer", handlers.stockTransfer);
+  insts.app.post("/offhire", handlers.offhire);
   insts.app.use(handlers.error);
 
   return insts;

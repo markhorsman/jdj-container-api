@@ -318,53 +318,53 @@ module.exports = function (req, res, next) {
             })
         }
 
-        try {
-            result = await getContract(r, req.body.CONTNO);
-            if (!result || !result.RECORDER || !result.ACCT) throw new Error('Get Contract: no results');
-            contractRecorder = result.RECORDER;
-            contractACCT = result.ACCT;
-        } catch (e) {
-            console.log(e);
-            transaction.rollback(err => {
-                if (err) console.log(err);
-                throw new errors.http.BadRequest(failedMsg);
-            })
-        }
+        // try {
+        //     result = await getContract(r, req.body.CONTNO);
+        //     if (!result || !result.RECORDER || !result.ACCT) throw new Error('Get Contract: no results');
+        //     contractRecorder = result.RECORDER;
+        //     contractACCT = result.ACCT;
+        // } catch (e) {
+        //     console.log(e);
+        //     transaction.rollback(err => {
+        //         if (err) console.log(err);
+        //         throw new errors.http.BadRequest(failedMsg);
+        //     })
+        // }
 
-        try {
-            result = await getVatCode(r, contractACCT);
-            if (!result || typeof result.VATCODE === 'undefined') throw new Error('Get VatCode: no results');
-            vatCode = result.VATCODE;
-        } catch (e) {
-            console.log(e);
-            transaction.rollback(err => {
-                if (err) console.log(err);
-                throw new errors.http.BadRequest(failedMsg);
-            })
-        }
+        // try {
+        //     result = await getVatCode(r, contractACCT);
+        //     if (!result || typeof result.VATCODE === 'undefined') throw new Error('Get VatCode: no results');
+        //     vatCode = result.VATCODE;
+        // } catch (e) {
+        //     console.log(e);
+        //     transaction.rollback(err => {
+        //         if (err) console.log(err);
+        //         throw new errors.http.BadRequest(failedMsg);
+        //     })
+        // }
 
-        try {
-            result = await getVatRate(r, vatCode);
-            if (!result || typeof result.VATRATE === 'undefined') throw new Error('Get VatRate: no results');
-            vatRate = result.VATRATE;
-        } catch (e) {
-            console.log(e);
-            transaction.rollback(err => {
-                if (err) console.log(err);
-                throw new errors.http.BadRequest(failedMsg);
-            })
-        }
+        // try {
+        //     result = await getVatRate(r, vatCode);
+        //     if (!result || typeof result.VATRATE === 'undefined') throw new Error('Get VatRate: no results');
+        //     vatRate = result.VATRATE;
+        // } catch (e) {
+        //     console.log(e);
+        //     transaction.rollback(err => {
+        //         if (err) console.log(err);
+        //         throw new errors.http.BadRequest(failedMsg);
+        //     })
+        // }
 
-        try {
-            result = await updateContract(r, contractRecorder, lineTotal, vatRate);
-            if (!result) throw new Error('Update Contract: no rows affected');
-        } catch (e) {
-            console.log(e);
-            transaction.rollback(err => {
-                if (err) console.log(err);
-                throw new errors.http.BadRequest(failedMsg);
-            })
-        }
+        // try {
+        //     result = await updateContract(r, contractRecorder, lineTotal, vatRate);
+        //     if (!result) throw new Error('Update Contract: no rows affected');
+        // } catch (e) {
+        //     console.log(e);
+        //     transaction.rollback(err => {
+        //         if (err) console.log(err);
+        //         throw new errors.http.BadRequest(failedMsg);
+        //     })
+        // }
 
 
         t.commit(err => {

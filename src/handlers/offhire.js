@@ -40,7 +40,7 @@ const getContItem = async (r, contno, itemno) => {
         result = await r
             .input('contno', sql.NVarChar, contno)
             .input('itemno', sql.NVarChar, itemno)
-            .query(`SELECT TOP 1 RECORDER, LINETOT FROM dbo.ContItems WHERE CONTNO = @contno AND ITEMNO = @itemno`);
+            .query(`SELECT TOP 1 RECORDER, LINETOT FROM dbo.ContItems WHERE CONTNO = @contno AND ITEMNO = @itemno ORDER BY ROWORDER DESC`);
     } catch (e) {
         throw e;
     }

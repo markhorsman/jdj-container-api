@@ -368,12 +368,11 @@ module.exports = function (req, res, next) {
 
 
         t.commit(err => {
-            console.log(err);
             if (err) {
                 throw new errors.http.BadRequest(failedMsg);
             }
 
-            return res.status(200).send({ success: true, stkDepotRecorder, stockRecorder });
+            return res.status(200).send({ success: true });
         });
     })
 }

@@ -41,7 +41,8 @@ const getContItem = async (r, contno, itemno, memo) => {
             .input('contno', sql.NVarChar, contno)
             .input('itemno', sql.NVarChar, itemno)
             .input('memo', sql.NVarChar, memo)
-            .query(`SELECT TOP 1 RECORDER, LINETOT FROM dbo.ContItems WHERE CONTNO = @contno AND ITEMNO = @itemno AND MEMO LIKE %@memo% ORDER BY ROWORDER DESC`);
+            .input('status', sql.Int, 1)
+            .query(`SELECT TOP 1 RECORDER, LINETOT FROM dbo.ContItems WHERE CONTNO = @contno AND ITEMNO = @itemno AND MEMO LIKE %@memo% AND STATUS = @status ORDER BY ROWORDER DESC`);
     } catch (e) {
         throw e;
     }

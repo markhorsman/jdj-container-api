@@ -33,14 +33,15 @@ const getStock = async (r, itemno) => {
     return (result && result.recordset && result.recordset.length ? result.recordset[0] : false);
 };
 
-const getContItem = async (r, contno, itemno) => {
+const getContItem = async (r, contno, itemno, memo) => {
     let result;
 
     try {
         result = await r
             .input('contno', sql.NVarChar, contno)
             .input('itemno', sql.NVarChar, itemno)
-            .query(`SELECT TOP 1 RECORDER, LINETOT FROM dbo.ContItems WHERE CONTNO = @contno AND ITEMNO = @itemno`);
+            .input('memo', sql.NVarChar, memo)
+            .query(`SELECT TOP 1 RECORDER, LINETOT FROM dbo.ContItems WHERE CONTNO = @contno AND ITEMNO = @itemno AND MEMO LIKE %@memo%`);
     } catch (e) {
         throw e;
     }
@@ -200,7 +201,13 @@ const updateContract = async (r, recorder, linetot, vatrate) => {
 };
 
 module.exports = function (req, res, next) {
-    if (!req.body || !req.body.CONTNO || !req.body.ITEMNO || !req.body.USERNAME || !req.body.QTY) {
+    if (!req.body ||
+        !req.body.CONTNO ||
+        !req.body.ITEMNO ||
+        !req.body.USERNAME ||
+        !req.body.QTY ||
+        !req.body.MEMO
+    ) {
         throw new errors.http.BadRequest(`Could not offhire item: ${req.body.ITEMNO} (missing params)`);
     }
 
@@ -284,7 +291,7 @@ module.exports = function (req, res, next) {
         }
 
         try {
-            result = await getContItem(r, req.body.CONTNO, req.body.ITEMNO);
+            result = await getContItem(r, req.body.CONTNO, req.body.ITEMNO, req.body.MEMO);
             if (!result || !result.RECORDER || typeof result.LINETOT === 'undefined') throw new Error('Get ContItem: no results');
             contItemRecorder = result.RECORDER;
             lineTotal = result.LINETOT;

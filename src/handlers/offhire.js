@@ -33,16 +33,13 @@ const getStock = async (r, itemno) => {
     return (result && result.recordset && result.recordset.length ? result.recordset[0] : false);
 };
 
-const getContItem = async (r, contno, itemno, memo) => {
+const getStockQTYHire = async (r, recorder) => {
     let result;
 
     try {
         result = await r
-            .input('contno', sql.NVarChar, contno)
-            .input('itemno', sql.NVarChar, itemno)
-            .input('memo', sql.NVarChar, memo)
-            .input('status', sql.Int, 1)
-            .query(`SELECT TOP 1 RECORDER, LINETOT FROM dbo.ContItems WHERE CONTNO = @contno AND ITEMNO = @itemno AND MEMO LIKE %@memo% AND STATUS = @status ORDER BY ROWORDER DESC`);
+            .input('recorder', sql.NVarChar, recorder)
+            .query(`SELECT TOP 1 QTYHIRE FROM dbo.Stock WHERE RECORDER = @recorder`);
     } catch (e) {
         throw e;
     }
@@ -50,49 +47,64 @@ const getContItem = async (r, contno, itemno, memo) => {
     return (result && result.recordset && result.recordset.length ? result.recordset[0] : false);
 };
 
-const getContract = async (r, contno) => {
-    let result;
+// const getContItem = async (r, contno, itemno, memo) => {
+//     let result;
 
-    try {
-        result = await r
-            .input('contno', sql.NVarChar, contno)
-            .query(`SELECT TOP 1 RECORDER, ACCT FROM dbo.Contract WHERE CONTNO = @contno`);
-    } catch (e) {
-        throw e;
-    }
+//     try {
+//         result = await r
+//             .input('contno', sql.NVarChar, contno)
+//             .input('itemno', sql.NVarChar, itemno)
+//             .input('memo', sql.NVarChar, memo)
+//             .input('status', sql.Int, 1)
+//             .query(`SELECT TOP 1 RECORDER, LINETOT FROM dbo.ContItems WHERE CONTNO = @contno AND ITEMNO = @itemno AND MEMO LIKE %@memo% AND STATUS = @status ORDER BY ROWORDER DESC`);
+//     } catch (e) {
+//         throw e;
+//     }
 
-    return (result && result.recordset && result.recordset.length ? result.recordset[0] : false);
-};
+//     return (result && result.recordset && result.recordset.length ? result.recordset[0] : false);
+// };
 
-const getVatCode = async (r, acct) => {
-    let result;
+// const getContract = async (r, contno) => {
+//     let result;
 
-    try {
-        result = await r
-            .input('acct', sql.NVarChar, acct)
-            .query(`SELECT TOP 1 VATCODE FROM dbo.Lookup WHERE ACCT = @acct`);
-    } catch (e) {
-        throw e;
-    }
+//     try {
+//         result = await r
+//             .input('contno', sql.NVarChar, contno)
+//             .query(`SELECT TOP 1 RECORDER, ACCT FROM dbo.Contract WHERE CONTNO = @contno`);
+//     } catch (e) {
+//         throw e;
+//     }
 
-    return (result && result.recordset && result.recordset.length ? result.recordset[0] : false);
-};
+//     return (result && result.recordset && result.recordset.length ? result.recordset[0] : false);
+// };
 
-const getVatRate = async (r, vatcode) => {
-    let result;
+// const getVatCode = async (r, acct) => {
+//     let result;
 
-    try {
-        result = await r
-            .input('vatcode', sql.NVarChar, vatcode)
-            .query(`SELECT TOP 1 VATRATE FROM dbo.VatRates WHERE VATCODE = @vatcode`);
-    } catch (e) {
-        throw e;
-    }
+//     try {
+//         result = await r
+//             .input('acct', sql.NVarChar, acct)
+//             .query(`SELECT TOP 1 VATCODE FROM dbo.Lookup WHERE ACCT = @acct`);
+//     } catch (e) {
+//         throw e;
+//     }
 
-    return (result && result.recordset && result.recordset.length ? result.recordset[0] : false);
-};
+//     return (result && result.recordset && result.recordset.length ? result.recordset[0] : false);
+// };
 
+// const getVatRate = async (r, vatcode) => {
+//     let result;
 
+//     try {
+//         result = await r
+//             .input('vatcode', sql.NVarChar, vatcode)
+//             .query(`SELECT TOP 1 VATRATE FROM dbo.VatRates WHERE VATCODE = @vatcode`);
+//     } catch (e) {
+//         throw e;
+//     }
+
+//     return (result && result.recordset && result.recordset.length ? result.recordset[0] : false);
+// };
 
 const updateContAddr = async (r, contno) => {
     let result;
@@ -108,14 +120,20 @@ const updateContAddr = async (r, contno) => {
     return (result && result.rowsAffected ? result.rowsAffected[0] : false);
 };
 
-const updateStkDepot = async (r, recorder, qty) => {
+const updateStkDepot = async (r, recorder, qtyok, qtydam, qtylost) => {
+    // STKLEVEL = STKLEVEL - QTYLOST
+    // QTYREP = QTYREP + QTYDAM
+    // ONHIRE = ONHIRE - QTYOK
+
     let result;
     try {
         result = await r
-            .input('qty', sql.Int, parseInt(qty))
+            .input('qtyok', sql.Int, parseInt(qtyok))
+            .input('qtydam', sql.Int, parseInt(qtydam))
+            .input('qtylost', sql.Int, parseInt(qtylost))
             .input('sid', sql.NVarChar, moment().format('YYYY-MM-DD HH:mm:ss'))
             .input('recorder', sql.NVarChar, recorder)
-            .query(`UPDATE dbo.StkDepots SET STKLEVEL = STKLEVEL + @qty, ONHIRE = ONHIRE - @qty, SID = @sid WHERE RECORDER = @recorder`);
+            .query(`UPDATE dbo.StkDepots SET STKLEVEL = STKLEVEL - @qtylost, QTYREP = QTYREP + @qtydam, ONHIRE = ONHIRE - @qtyOK, SID = @sid WHERE RECORDER = @recorder`);
     } catch (e) {
         throw e;
     }
@@ -130,6 +148,32 @@ const updateStock = async (r, recorder, qty) => {
             .input('qty', sql.Int, parseInt(qty))
             .input('recorder', sql.NVarChar, recorder)
             .query(`UPDATE dbo.Stock SET QTYHIRE = QTYHIRE - @qty, STKLEVEL = STKLEVEL + @qty WHERE RECORDER = @recorder`);
+    } catch (e) {
+        throw e;
+    }
+
+    return (result && result.rowsAffected ? result.rowsAffected[0] : false);
+};
+
+const updateStockStatus = async (r, recorder, qtyhire, unique, qtyok, qtydam, qtylost) => {
+    // if stock item = UNIQUE : QTYOK? SET STATUS = 0, QTYDAM? SET STATUS = 2, QTYLOST? SET STATUS = 9
+    // if stock item != UNIQUE AND QTYHIRE = 0, SET STATUS = 0
+    let status = 1;
+
+    if (parseInt(unique)) {
+        if (parseInt(qtyok)) status = 0;
+        else if (parseInt(qtydam)) status = 2;
+        else if (parseInt(qtylost)) status = 9;
+    } else {
+        if (!parseInt(qtyhire)) status = 0;
+    }
+
+    let result;
+    try {
+        result = await r
+            .input('status', sql.Int, status)
+            .input('recorder', sql.NVarChar, recorder)
+            .query(`UPDATE dbo.Stock SET STATUS = @status WHERE RECORDER = @recorder`);
     } catch (e) {
         throw e;
     }
@@ -176,30 +220,30 @@ const insertContNote = async (r, username, contno) => {
     return (result && result.rowsAffected ? result.rowsAffected[0] : false);
 };
 
-const updateContract = async (r, recorder, linetot, vatrate) => {
-    let result;
-    try {
-        result = await r
-            .input('linetot', sql.Decimal(15, 2), linetot)
-            .input('recorder', sql.NVarChar, recorder)
-            .input('dt', sql.NVarChar, moment().format('YYYY-MM-DD HH:mm:ss'))
-            .input('vat', sql.Int, (parseInt(vatrate) === 0 ? 1 : parseInt(vatrate) / 100))
-            .query(`UPDATE 
-                        dbo.Contracts 
-                    SET 
-                        GOODS = GOODS + @linetot, 
-                        VAT = VAT + (@linetot * @vat), 
-                        TOTAL = TOTAL + (@linetot + (@linetot * @vat)), 
-                        LASTCALC = @dt, 
-                        SID = @dt 
-                    WHERE 
-                        RECORDER = @recorder`);
-    } catch (e) {
-        throw e;
-    }
+// const updateContract = async (r, recorder, linetot, vatrate) => {
+//     let result;
+//     try {
+//         result = await r
+//             .input('linetot', sql.Decimal(15, 2), linetot)
+//             .input('recorder', sql.NVarChar, recorder)
+//             .input('dt', sql.NVarChar, moment().format('YYYY-MM-DD HH:mm:ss'))
+//             .input('vat', sql.Int, (parseInt(vatrate) === 0 ? 1 : parseInt(vatrate) / 100))
+//             .query(`UPDATE 
+//                         dbo.Contracts 
+//                     SET 
+//                         GOODS = GOODS + @linetot, 
+//                         VAT = VAT + (@linetot * @vat), 
+//                         TOTAL = TOTAL + (@linetot + (@linetot * @vat)), 
+//                         LASTCALC = @dt, 
+//                         SID = @dt 
+//                     WHERE 
+//                         RECORDER = @recorder`);
+//     } catch (e) {
+//         throw e;
+//     }
 
-    return (result && result.rowsAffected ? result.rowsAffected[0] : false);
-};
+//     return (result && result.rowsAffected ? result.rowsAffected[0] : false);
+// };
 
 module.exports = function (req, res, next) {
     if (!req.body ||
@@ -207,7 +251,12 @@ module.exports = function (req, res, next) {
         !req.body.ITEMNO ||
         !req.body.USERNAME ||
         !req.body.QTY ||
-        !req.body.MEMO
+        typeof req.body.QTYOK === 'undefined' ||
+        typeof req.body.QTYDAM === 'undefined' ||
+        typeof req.body.QTYLOST === 'undefined' ||
+        typeof req.body.UNIQUE === 'undefined' ||
+        !req.body.MEMO ||
+        !req.body.CONTITEM_RECORDER
     ) {
         throw new errors.http.BadRequest(`Could not offhire item: ${req.body.ITEMNO} (missing params)`);
     }
@@ -217,6 +266,7 @@ module.exports = function (req, res, next) {
     t.begin(async err => {
         let stkDepotRecorder,
             stockRecorder,
+            stockQTYHire,
             contItemRecorder,
             contractRecorder,
             contractACCT,
@@ -232,6 +282,7 @@ module.exports = function (req, res, next) {
             rolledBack = true
         });
 
+        contItemRecorder = req.body.CONTITEM_RECORDER;
         const r = new sql.Request(t);
 
         try {
@@ -258,7 +309,7 @@ module.exports = function (req, res, next) {
         }
 
         try {
-            result = await updateStkDepot(r, stkDepotRecorder, req.body.QTY);
+            result = await updateStkDepot(r, stkDepotRecorder, req.body.QTYOK, req.body.QTYDAM, req.body.QTYLOST);
             if (!result) throw new Error('Update StkDepot: no rows affected');
         } catch (e) {
             console.log(e);
@@ -291,11 +342,33 @@ module.exports = function (req, res, next) {
             })
         }
 
+        if (!parseInt(req.body.UNIQUE)) {
+            try {
+                result = await getStockQTYHire(r, stockRecorder);
+                if (!result || !result.QTYHIRE) throw new Error('Get StockQTYHire: no results');
+                stockQTYHire = result.QTYHIRE;
+            } catch (e) {
+                console.log(e);
+                transaction.rollback(err => {
+                    if (err) console.log(err);
+                    throw new errors.http.BadRequest(failedMsg);
+                })
+            }
+        } else {
+            stockQTYHire = null;
+        }
+
         try {
-            result = await getContItem(r, req.body.CONTNO, req.body.ITEMNO, req.body.MEMO);
-            if (!result || !result.RECORDER || typeof result.LINETOT === 'undefined') throw new Error('Get ContItem: no results');
-            contItemRecorder = result.RECORDER;
-            lineTotal = result.LINETOT;
+            result = await updateStockStatus(
+                r,
+                stockRecorder,
+                stockQTYHire,
+                req.body.UNIQUE,
+                req.body.QTYOK,
+                req.body.QTYDAM,
+                req.body.QTYLOST
+            );
+            if (!result) throw new Error('Update Stock Status: no rows affected');
         } catch (e) {
             console.log(e);
             transaction.rollback(err => {
@@ -303,6 +376,19 @@ module.exports = function (req, res, next) {
                 throw new errors.http.BadRequest(failedMsg);
             })
         }
+
+        // try {
+        //     result = await getContItem(r, req.body.CONTNO, req.body.ITEMNO, req.body.MEMO);
+        //     if (!result || !result.RECORDER || typeof result.LINETOT === 'undefined') throw new Error('Get ContItem: no results');
+        //     contItemRecorder = result.RECORDER;
+        //     lineTotal = result.LINETOT;
+        // } catch (e) {
+        //     console.log(e);
+        //     transaction.rollback(err => {
+        //         if (err) console.log(err);
+        //         throw new errors.http.BadRequest(failedMsg);
+        //     })
+        // }
 
         try {
             result = await updateContItem(r, contItemRecorder, req.body.QTY);

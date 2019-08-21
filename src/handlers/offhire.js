@@ -181,14 +181,14 @@ const updateStockStatus = async (r, recorder, qtyhire, unique, qtyok, qtydam, qt
     return (result && result.rowsAffected ? result.rowsAffected[0] : false);
 };
 
-const updateContItem = async (r, recorder, qty) => {
+const updateContItem = async (r, recorder, qty, hired) => {
     let result;
     try {
         result = await r
             .input('qty', sql.Decimal(15, 2), parseInt(qty))
             .input('recorder', sql.NVarChar, recorder)
             .input('dt', sql.NVarChar, moment().format('YYYY-MM-DD HH:mm:ss'))
-            .input('status', sql.Int, 2)
+            .input('status', sql.Int, (qty >= hired ? 2 : 1))
             .query(`UPDATE dbo.ContItems SET STATUS = @status, QTYRETD = @qty, LASTINV = @dt, DOCDATE#5 = @dt, SID = @dt WHERE RECORDER = @recorder`);
     } catch (e) {
         throw e;
@@ -255,6 +255,7 @@ module.exports = function (req, res, next) {
         typeof req.body.QTYDAM === 'undefined' ||
         typeof req.body.QTYLOST === 'undefined' ||
         typeof req.body.UNIQUE === 'undefined' ||
+        typeof req.body.CONTITEM_HIRED === 'undefined' ||
         !req.body.MEMO ||
         !req.body.CONTITEM_RECORDER
     ) {
@@ -267,7 +268,6 @@ module.exports = function (req, res, next) {
         let stkDepotRecorder,
             stockRecorder,
             stockQTYHire,
-            contItemRecorder,
             contractRecorder,
             contractACCT,
             lineTotal,
@@ -282,7 +282,6 @@ module.exports = function (req, res, next) {
             rolledBack = true
         });
 
-        contItemRecorder = req.body.CONTITEM_RECORDER;
         const r = new sql.Request(t);
 
         try {
@@ -391,7 +390,7 @@ module.exports = function (req, res, next) {
         // }
 
         try {
-            result = await updateContItem(r, contItemRecorder, req.body.QTY);
+            result = await updateContItem(r, req.body.CONTITEM_RECORDER, req.body.QTY, req.body.CONTITEM_HIRED);
             if (!result) throw new Error('Update ContItem: no rows affected');
         } catch (e) {
             console.log(e);

@@ -11,7 +11,7 @@ const getStkDepot = async (r, itemno, code) => {
     try {
         result = await r
             .input('itemno', sql.NVarChar, itemno)
-            .input('code', slq.NVarChar, code)
+            .input('code', sql.NVarChar, code)
             .query(`SELECT TOP 1 RECORDER FROM dbo.StkDepots WHERE ITEMNO = @itemno AND CODE = @code`);
     } catch (e) {
         throw e;

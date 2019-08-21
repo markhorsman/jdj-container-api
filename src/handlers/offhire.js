@@ -181,14 +181,14 @@ const updateStockStatus = async (r, recorder, qtyhire, unique, qtyok, qtydam, qt
     return (result && result.rowsAffected ? result.rowsAffected[0] : false);
 };
 
-const updateContItem = async (r, recorder, qty, hired) => {
+const updateContItem = async (r, recorder, qty, hired, qtyretd) => {
     let result;
     try {
         result = await r
             .input('qty', sql.Decimal(15, 2), parseInt(qty))
             .input('recorder', sql.NVarChar, recorder)
             .input('dt', sql.NVarChar, moment().format('YYYY-MM-DD HH:mm:ss'))
-            .input('status', sql.Int, (qty >= hired ? 2 : 1))
+            .input('status', sql.Int, ((qty + qtyretd) >= hired ? 2 : 1))
             .query(`UPDATE dbo.ContItems SET STATUS = @status, QTYRETD = QTYRETD + @qty, LASTINV = @dt, DOCDATE#5 = @dt, SID = @dt WHERE RECORDER = @recorder`);
     } catch (e) {
         throw e;
@@ -256,6 +256,7 @@ module.exports = function (req, res, next) {
         typeof req.body.QTYLOST === 'undefined' ||
         typeof req.body.UNIQUE === 'undefined' ||
         typeof req.body.CONTITEM_HIRED === 'undefined' ||
+        typeof req.body.CONTITEM_QTYRETD === 'undefined' ||
         !req.body.MEMO ||
         !req.body.CONTITEM_RECORDER
     ) {
@@ -390,7 +391,7 @@ module.exports = function (req, res, next) {
         // }
 
         try {
-            result = await updateContItem(r, req.body.CONTITEM_RECORDER, req.body.QTY, req.body.CONTITEM_HIRED);
+            result = await updateContItem(r, req.body.CONTITEM_RECORDER, req.body.QTY, req.body.CONTITEM_HIRED, req.body.CONTITEM_QTYRETD);
             if (!result) throw new Error('Update ContItem: no rows affected');
         } catch (e) {
             console.log(e);

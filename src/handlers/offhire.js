@@ -133,7 +133,7 @@ const updateStkDepot = async (r, recorder, qtyok, qtydam, qtylost) => {
             .input('qtylost', sql.Int, parseInt(qtylost))
             .input('sid', sql.NVarChar, moment().format('YYYY-MM-DD HH:mm:ss'))
             .input('recorder', sql.NVarChar, recorder)
-            .query(`UPDATE dbo.StkDepots SET STKLEVEL = STKLEVEL - @qtylost, QTYREP = QTYREP + @qtydam, ONHIRE = ONHIRE - @qtyOK, SID = @sid WHERE RECORDER = @recorder`);
+            .query(`UPDATE dbo.StkDepots SET STKLEVEL = STKLEVEL + @qtyok, QTYREP = QTYREP + @qtydam, ONHIRE = ONHIRE - @qtyok, SID = @sid WHERE RECORDER = @recorder`);
     } catch (e) {
         throw e;
     }
@@ -290,7 +290,7 @@ module.exports = function (req, res, next) {
             if (!result) throw new Error('Update ContAddr: no rows affected');
         } catch (e) {
             console.log(e);
-            transaction.rollback(err => {
+            t.rollback(err => {
                 if (err) console.log(err);
                 throw new errors.http.BadRequest(failedMsg);
             })
@@ -302,7 +302,7 @@ module.exports = function (req, res, next) {
             stkDepotRecorder = result.RECORDER;
         } catch (e) {
             console.log(e);
-            transaction.rollback(err => {
+            t.rollback(err => {
                 if (err) console.log(err);
                 throw new errors.http.BadRequest(failedMsg);
             })
@@ -313,7 +313,7 @@ module.exports = function (req, res, next) {
             if (!result) throw new Error('Update StkDepot: no rows affected');
         } catch (e) {
             console.log(e);
-            transaction.rollback(err => {
+            t.rollback(err => {
                 if (err) console.log(err);
                 throw new errors.http.BadRequest(failedMsg);
             })
@@ -325,7 +325,7 @@ module.exports = function (req, res, next) {
             stockRecorder = result.RECORDER;
         } catch (e) {
             console.log(e);
-            transaction.rollback(err => {
+            t.rollback(err => {
                 if (err) console.log(err);
                 throw new errors.http.BadRequest(failedMsg);
             })
@@ -336,7 +336,7 @@ module.exports = function (req, res, next) {
             if (!result) throw new Error('Update Stock: no rows affected');
         } catch (e) {
             console.log(e);
-            transaction.rollback(err => {
+            t.rollback(err => {
                 if (err) console.log(err);
                 throw new errors.http.BadRequest(failedMsg);
             })
@@ -349,7 +349,7 @@ module.exports = function (req, res, next) {
                 stockQTYHire = result.QTYHIRE;
             } catch (e) {
                 console.log(e);
-                transaction.rollback(err => {
+                t.rollback(err => {
                     if (err) console.log(err);
                     throw new errors.http.BadRequest(failedMsg);
                 })
@@ -371,7 +371,7 @@ module.exports = function (req, res, next) {
             if (!result) throw new Error('Update Stock Status: no rows affected');
         } catch (e) {
             console.log(e);
-            transaction.rollback(err => {
+            t.rollback(err => {
                 if (err) console.log(err);
                 throw new errors.http.BadRequest(failedMsg);
             })
@@ -384,7 +384,7 @@ module.exports = function (req, res, next) {
         //     lineTotal = result.LINETOT;
         // } catch (e) {
         //     console.log(e);
-        //     transaction.rollback(err => {
+        //     t.rollback(err => {
         //         if (err) console.log(err);
         //         throw new errors.http.BadRequest(failedMsg);
         //     })
@@ -395,7 +395,7 @@ module.exports = function (req, res, next) {
             if (!result) throw new Error('Update ContItem: no rows affected');
         } catch (e) {
             console.log(e);
-            transaction.rollback(err => {
+            t.rollback(err => {
                 if (err) console.log(err);
                 throw new errors.http.BadRequest(failedMsg);
             })
@@ -406,7 +406,7 @@ module.exports = function (req, res, next) {
             if (!result) throw new Error('Insert ContNote: no rows affected');
         } catch (e) {
             console.log(e);
-            transaction.rollback(err => {
+            t.rollback(err => {
                 if (err) console.log(err);
                 throw new errors.http.BadRequest(failedMsg);
             })
@@ -419,7 +419,7 @@ module.exports = function (req, res, next) {
         //     contractACCT = result.ACCT;
         // } catch (e) {
         //     console.log(e);
-        //     transaction.rollback(err => {
+        //     t.rollback(err => {
         //         if (err) console.log(err);
         //         throw new errors.http.BadRequest(failedMsg);
         //     })
@@ -431,7 +431,7 @@ module.exports = function (req, res, next) {
         //     vatCode = result.VATCODE;
         // } catch (e) {
         //     console.log(e);
-        //     transaction.rollback(err => {
+        //     t.rollback(err => {
         //         if (err) console.log(err);
         //         throw new errors.http.BadRequest(failedMsg);
         //     })
@@ -443,7 +443,7 @@ module.exports = function (req, res, next) {
         //     vatRate = result.VATRATE;
         // } catch (e) {
         //     console.log(e);
-        //     transaction.rollback(err => {
+        //     t.rollback(err => {
         //         if (err) console.log(err);
         //         throw new errors.http.BadRequest(failedMsg);
         //     })
@@ -454,7 +454,7 @@ module.exports = function (req, res, next) {
         //     if (!result) throw new Error('Update Contract: no rows affected');
         // } catch (e) {
         //     console.log(e);
-        //     transaction.rollback(err => {
+        //     t.rollback(err => {
         //         if (err) console.log(err);
         //         throw new errors.http.BadRequest(failedMsg);
         //     })

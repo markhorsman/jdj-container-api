@@ -189,7 +189,7 @@ const updateContItem = async (r, recorder, qty, hired) => {
             .input('recorder', sql.NVarChar, recorder)
             .input('dt', sql.NVarChar, moment().format('YYYY-MM-DD HH:mm:ss'))
             .input('status', sql.Int, (qty >= hired ? 2 : 1))
-            .query(`UPDATE dbo.ContItems SET STATUS = @status, QTYRETD = @qty, LASTINV = @dt, DOCDATE#5 = @dt, SID = @dt WHERE RECORDER = @recorder`);
+            .query(`UPDATE dbo.ContItems SET STATUS = @status, QTYRETD = QTYRETD + @qty, LASTINV = @dt, DOCDATE#5 = @dt, SID = @dt WHERE RECORDER = @recorder`);
     } catch (e) {
         throw e;
     }

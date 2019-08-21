@@ -5,13 +5,14 @@ const errors = require('../../lib/classes/errors');
 
 const generateRecId = () => moment().format('YYYYMMDDHHmmss') + Math.floor(100000 + Math.random() * 900000);
 
-const getStkDepot = async (r, itemno) => {
+const getStkDepot = async (r, itemno, code) => {
     let result;
 
     try {
         result = await r
             .input('itemno', sql.NVarChar, itemno)
-            .query(`SELECT TOP 1 RECORDER FROM dbo.StkDepots WHERE ITEMNO = @itemno`);
+            .input('code', slq.NVarChar, code)
+            .query(`SELECT TOP 1 RECORDER FROM dbo.StkDepots WHERE ITEMNO = @itemno AND CODE = @code`);
     } catch (e) {
         throw e;
     }
@@ -251,6 +252,7 @@ module.exports = function (req, res, next) {
         !req.body.ITEMNO ||
         !req.body.USERNAME ||
         !req.body.QTY ||
+        !req.body.DEPOT ||
         typeof req.body.QTYOK === 'undefined' ||
         typeof req.body.QTYDAM === 'undefined' ||
         typeof req.body.QTYLOST === 'undefined' ||
@@ -297,7 +299,7 @@ module.exports = function (req, res, next) {
         }
 
         try {
-            result = await getStkDepot(r, req.body.ITEMNO);
+            result = await getStkDepot(r, req.body.ITEMNO, req.body.DEPOT);
             if (!result || !result.RECORDER) throw new Error('Get StkDepot: no results');
             stkDepotRecorder = result.RECORDER;
         } catch (e) {

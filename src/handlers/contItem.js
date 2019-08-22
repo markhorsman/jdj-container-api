@@ -3,11 +3,11 @@ const sql = P.promisifyAll(require("mssql"));
 const errors = require('../../lib/classes/errors');
 
 module.exports = function (req, res, next) {
-    const update = (recid, status) => {
+    const update = (recid, memo) => {
         return req.mssql.request()
-            .input('status', sql.Int, parseInt(status))
+            .input('memo', sql.NVarChar, memo)
             .input('recid', sql.NVarChar, recid)
-            .query('UPDATE dbo.ContItems SET STATUS = @status WHERE RECID = @recid')
+            .query('UPDATE dbo.ContItems SET MEMO = @memo WHERE RECID = @recid')
             .then(rtn)
             .catch(next)
             ;
@@ -15,10 +15,10 @@ module.exports = function (req, res, next) {
 
     const rtn = result => {
         if (!result || !result.rowsAffected[0])
-            throw new errors.http.NotFound(`Updaten van contitem met recid: ${req.params.recid} is mislukt.`);
+            throw new errors.http.NotFound(`Updaten van contract item met recid: ${req.params.recid} is mislukt.`);
 
-        return res.status(200).send({ success: true, data: req.params });
+        return res.status(200).send({ success: true });
     };
 
-    return update(req.params.recid, req.params.status);
+    return update(req.params.RECID, req.body.MEMO);
 }

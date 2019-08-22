@@ -15,10 +15,10 @@ module.exports = function (req, res, next) {
 
     const rtn = result => {
         if (!result || !result.rowsAffected[0])
-            throw new errors.http.NotFound(`Updaten van contract item met recorder: ${req.params.RECORDER} is mislukt.`);
+            throw new errors.http.NotFound(`Updaten van contract item met recorder: ${req.params.recorder} is mislukt.`);
 
         return res.status(200).send({ success: true });
     };
 
-    return update(req.params.RECORDER, req.body.MEMO);
+    return update(req.params.recorder, req.body.MEMO);
 }

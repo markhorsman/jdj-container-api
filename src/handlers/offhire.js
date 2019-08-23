@@ -271,11 +271,11 @@ module.exports = function (req, res, next) {
         let stkDepotRecorder,
             stockRecorder,
             stockQTYHire,
-            contractRecorder,
-            contractACCT,
-            lineTotal,
-            vatCode,
-            vatRate,
+            // contractRecorder,
+            // contractACCT,
+            // lineTotal,
+            // vatCode,
+            // vatRate,
             result;
         let rolledBack = false;
 
@@ -347,7 +347,7 @@ module.exports = function (req, res, next) {
         if (!parseInt(req.body.UNIQUE)) {
             try {
                 result = await getStockQTYHire(r, stockRecorder);
-                if (!result || !result.QTYHIRE) throw new Error('Get StockQTYHire: no results');
+                if (!result || typeof result.QTYHIRE === 'undefined') throw new Error('Get StockQTYHire: no results');
                 stockQTYHire = result.QTYHIRE;
             } catch (e) {
                 console.log(e);

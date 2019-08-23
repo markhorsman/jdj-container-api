@@ -198,6 +198,19 @@ const updateContItem = async (r, recorder, qty, hired, qtyretd) => {
     return (result && result.rowsAffected ? result.rowsAffected[0] : false);
 };
 
+const updateOffhireInfoMobile = async (r, cirecid) => {
+    let result;
+    try {
+        result = await r
+            .input('cirecid', sql.NVarChar, cirecid)
+            .query(`UPDATE dbo.OHInfoMobile SET COMPLETED = 1 WHERE CIRECID = @cirecid`);
+    } catch (e) {
+        throw e;
+    }
+
+    return (result && result.rowsAffected ? result.rowsAffected[0] : false);
+};
+
 const insertContNote = async (r, username, contno) => {
     let result;
 
@@ -260,7 +273,8 @@ module.exports = function (req, res, next) {
         typeof req.body.CONTITEM_HIRED === 'undefined' ||
         typeof req.body.CONTITEM_QTYRETD === 'undefined' ||
         !req.body.MEMO ||
-        !req.body.CONTITEM_RECORDER
+        !req.body.CONTITEM_RECORDER ||
+        !req.body.CONTITEM_RECID
     ) {
         throw new errors.http.BadRequest(`Could not offhire item: ${req.body.ITEMNO} (missing params)`);
     }
@@ -395,6 +409,17 @@ module.exports = function (req, res, next) {
         try {
             result = await updateContItem(r, req.body.CONTITEM_RECORDER, req.body.QTY, req.body.CONTITEM_HIRED, req.body.CONTITEM_QTYRETD);
             if (!result) throw new Error('Update ContItem: no rows affected');
+        } catch (e) {
+            console.log(e);
+            t.rollback(err => {
+                if (err) console.log(err);
+                throw new errors.http.BadRequest(failedMsg);
+            })
+        }
+
+        try {
+            result = await updateOffhireInfoMobile(r, req.body.CONTITEM_RECID);
+            if (!result) throw new Error('Update OHInfoMobile: no rows affected');
         } catch (e) {
             console.log(e);
             t.rollback(err => {

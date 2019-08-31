@@ -13,9 +13,9 @@ module.exports = async function (req, res, next) {
                     dbo.Stock.PGROUP, 
                     dbo.Stock.GRPCODE, 
                     dbo.Stock.ITEMNO, 
-                    dbo.Stock.DESC#1, 
-                    dbo.Stock.DESC#2, 
-                    dbo.Stock.DESC#3, 
+                    dbo.Stock.DESC#1 AS DESC1, 
+                    dbo.Stock.DESC#2 AS DESC2,
+                    dbo.Stock.DESC#3 AS DESC3,
                     dbo.Stock.Status, 
                     dbo.Stock.STKLEVEL AS STKLEVEL_OVERALL, 
                     dbo.StkDepots.STKLEVEL 

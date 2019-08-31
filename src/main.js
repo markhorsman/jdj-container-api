@@ -64,7 +64,6 @@ const setup = insts => {
   insts.app.get("/customercontact/:identification?", handlers.customerContact.get);
   insts.app.post("/customercontact", handlers.customerContact.create);
   insts.app.put("/contitem/:recorder", handlers.contItem);
-  // insts.app.put("/stock/:recid", handlers.stock);
   insts.app.get("/stock/:depot", handlers.stock);
   insts.app.put("/stocktransfer", handlers.stockTransfer);
   insts.app.post("/offhire", handlers.offhire);

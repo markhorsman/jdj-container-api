@@ -24,7 +24,7 @@ module.exports = async function (req, res, next) {
                 LEFT JOIN
                     Stkdepots 
                 ON  
-                    StkDepots.ITEMNO = Stock.ITEMNO
+                    StkDepots.ITEMNO = Stock.ITEMNO AND Stkdepots.CODE = @depot
                 WHERE
                     Stock.CURRDEPOT = @depot
                 ORDER BY 

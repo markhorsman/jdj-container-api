@@ -17,8 +17,10 @@ module.exports = async function (req, res, next) {
                     dbo.Stock.DESC#2 AS DESC2,
                     dbo.Stock.DESC#3 AS DESC3,
                     dbo.Stock.Status, 
-                    dbo.Stock.STKLEVEL AS STKLEVEL_OVERALL, 
-                    dbo.StkDepots.STKLEVEL 
+                    dbo.Stock.STKLEVEL AS STKLEVEL_OVERALL,
+                    dbo.Stock.CURRDEPOT,
+                    dbo.Stock.UNIQUE,
+                    dbo.StkDepots.STKLEVEL
                 FROM 
                     dbo.Stock
                 LEFT JOIN

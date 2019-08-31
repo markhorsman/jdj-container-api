@@ -10,6 +10,7 @@ module.exports = async function (req, res, next) {
             .input('depot', sql.NVarChar, req.params.depot)
             .query(`
                 SELECT TOP 25000 
+                    dbo.Stock.RECID,
                     dbo.Stock.PGROUP, 
                     dbo.Stock.GRPCODE, 
                     dbo.Stock.ITEMNO, 

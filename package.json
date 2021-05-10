@@ -11,7 +11,7 @@
     "express": "^4.17.1",
     "express-basic-auth": "^1.2.0",
     "express-rate-limit": "^2.11.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "moment": "^2.20.1",
     "mssql": "^5.1.0",
     "nconf": "^0.10.0"
